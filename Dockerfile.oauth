@@ -1,0 +1,3 @@
+# Reuse the installed runtime/toolchain image; only replace the application.
+FROM ghcr.io/jiwoochris/artex-global@sha256:0fc4c91263bc072f831767e4669f41cccbe02801a785d8bae6e5c819b006b19c
+COPY dist/amd64/artex /app/artex

@@ -1,0 +1,14 @@
+# Local source build with ChatGPT OAuth. See docs/chatgpt-oauth.md.
+services:
+  artex:
+    image: artex-global:oauth-local
+    pull_policy: never
+    environment:
+      ARTEX_OAUTH_DIR: /app/.oauth
+    volumes:
+      - oauth_credentials:/app/.oauth
+      # Preserve the existing signing key when recreating the app container.
+      - ./.secrets/jwt.key:/app/jwt.key
+
+volumes:
+  oauth_credentials:

@@ -13,4 +13,9 @@ bench/__pycache__
 bench/.env
 bench/scheduler.py
 bench/entrypoint_v2.sh
+.env
+.secrets
+.oauth
+work
+docker-compose.override.yml
 bench/seed_v2.sh

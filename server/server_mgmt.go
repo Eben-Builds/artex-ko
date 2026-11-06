@@ -2069,6 +2069,10 @@ func (s *Server) pgListModels(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{"ok": false, "error": errMgmtNoAPIKey})
 		return
 	}
+	if isChatGPTReference(apiKey) {
+		writeJSON(w, 200, map[string]any{"ok": false, "error": "Use the ChatGPT OAuth panel to choose a model"})
+		return
+	}
 
 	baseURL := strings.TrimRight(strings.TrimSpace(req.BaseURL), "/")
 	provider := strings.TrimSpace(req.Provider)

@@ -1014,6 +1014,11 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/llm/pool", s.pgLLMPoolStatus)
 	mux.HandleFunc("POST /api/llm/pool/reset", s.pgLLMPoolReset)
 	mux.HandleFunc("POST /api/llm/models", s.pgListModels)
+	mux.HandleFunc("GET /api/llm/oauth/chatgpt", s.chatGPTStatus)
+	mux.HandleFunc("POST /api/llm/oauth/chatgpt/start", s.chatGPTStart)
+	mux.HandleFunc("GET /api/llm/oauth/chatgpt/models", s.chatGPTModels)
+	mux.HandleFunc("POST /api/llm/oauth/chatgpt/configure", s.chatGPTConfigure)
+	mux.HandleFunc("DELETE /api/llm/oauth/chatgpt", s.chatGPTDisconnect)
 
 	// 拦截规则管理
 	mux.HandleFunc("GET /api/intercept/rules", s.interceptListRules)
@@ -1048,6 +1053,7 @@ func (s *Server) Handler() http.Handler {
 	api := cors(s.requireAuth(mux))
 	root := http.NewServeMux()
 	root.Handle("/api/", api)
+	root.HandleFunc("GET /auth/callback", s.chatGPTCallback)
 	root.Handle("/", s.webuiHandler())
 	return root
 }

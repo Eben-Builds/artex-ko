@@ -3760,5 +3760,24 @@
       "name": "Vulnerability Retest",
       "description": "Launched manually from a finding's detail view; reads the original evidence and saves an independent retest conclusion."
     }
+  },
+  "chatgptOAuth": {
+    "title": "ChatGPT subscription · OAuth",
+    "description": "Connect an eligible ChatGPT account without an API key. Complete sign-in and consent in the window that opens, then select a model.",
+    "continue": "Continue with ChatGPT",
+    "pending": "Waiting for ChatGPT sign-in and consent…",
+    "connected": "Connected: {email}",
+    "disconnected": "ChatGPT is not connected.",
+    "refresh": "Refresh status",
+    "disconnect": "Disconnect locally",
+    "openLogin": "Open sign-in window",
+    "model": "Model",
+    "noModels": "No available models",
+    "activate": "Save and use this model",
+    "saved": "ChatGPT model activated; automatic API failover disabled.",
+    "limits": "Your plan's limits apply. This is not unlimited free API access. Tokens refresh automatically; expired or revoked sessions require sign-in. This connection never automatically falls back to paid API keys.",
+    "manage": "Manage app access and usage in ChatGPT Settings",
+    "invalidUrl": "Invalid ChatGPT authorization URL",
+    "editHint": "Use the ChatGPT OAuth panel above to change this connection's model."
   }
 }

@@ -31,6 +31,7 @@ import { api } from "@/lib/api";
 import type { LLMPoolMember, LLMPoolStatus, LLMProfile, LLMRetryOverride } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+import { ChatGPTOAuth } from "./_components/chatgpt-oauth";
 import { ProfileRetryFields, RetryPolicyPanel, ZERO_OVERRIDE } from "./_components/retry";
 
 // 思考开关(thinking.type)与思考强度(reasoning_effort)是两个【互相独立】的字段，
@@ -723,6 +724,7 @@ function ProfileSheet({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function LLMPage() {
+  const oauthText = useTranslations("chatgptOAuth");
   const t = useTranslations("llmPage");
   const [profiles, setProfiles] = React.useState<LLMProfile[]>([]);
   const [pool, setPool] = React.useState<LLMPoolStatus | null>(null);
@@ -731,10 +733,17 @@ export default function LLMPage() {
   // 「编辑 X」闪成「新建」。editing = null 表示新建。
   const [editOpen, setEditOpen] = React.useState(false);
   const [editing, setEditing] = React.useState<LLMProfile | null>(null);
-  const openEditor = React.useCallback((p: LLMProfile | null) => {
-    setEditing(p);
-    setEditOpen(true);
-  }, []);
+  const openEditor = React.useCallback(
+    (p: LLMProfile | null) => {
+      if (p?.api_key_hint === "ChatGPT OAuth") {
+        toast.info(oauthText("editHint"));
+        return;
+      }
+      setEditing(p);
+      setEditOpen(true);
+    },
+    [oauthText],
+  );
 
   // 一个配置在卡片上显示的「是否正常」。没填 Key 的配置根本发不出请求，比熔断更该先说。
   const healthOf = React.useCallback(
@@ -843,6 +852,8 @@ export default function LLMPage() {
           </Button>
         </div>
       </div>
+
+      <ChatGPTOAuth onConfigured={load} />
 
       <Tabs defaultValue="profiles" className="flex-1">
         <TabsList>

@@ -20,6 +20,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Autumn-27/artex/chatoauth"
 	"github.com/Autumn-27/artex/llmrec"
 	"github.com/Autumn-27/norma/agentcore"
 	"github.com/Autumn-27/norma/compaction"
@@ -254,9 +255,20 @@ func (c Config) Provider() string {
 // limiter lives on the single provider instance — so planner + all workers +
 // main agent (which share this provider) are bounded by one shared rate limit.
 func (c Config) NewProvider() (llm.Provider, error) {
+	chatGPT := isChatGPTKey(c.APIKey)
+	if chatGPT {
+		if c.Format != llm.FormatOpenAIResponses || (c.BaseURL != "" && c.BaseURL != chatoauth.APIBase) || c.Proxy != "" {
+			return nil, fmt.Errorf("ChatGPT OAuth requires OpenAI Responses, the official endpoint, and no proxy")
+		}
+		c.BaseURL = chatoauth.APIBase
+	}
 	client, err := quotaAwareHTTPClient(c.Proxy, c.SessionHeaderKey)
 	if err != nil {
 		return nil, err
+	}
+	if chatGPT {
+		client.Transport = chatGPTTransport{base: client.Transport, account: strings.TrimPrefix(c.APIKey, chatoauth.KeyPrefix)}
+		client.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
 	}
 	lc := llm.Config{
 		Format:     c.Format,
@@ -280,7 +292,11 @@ func (c Config) NewProvider() (llm.Provider, error) {
 	if c.RatePerSecond > 0 || c.RatePerMinute > 0 {
 		lc.RateLimit = &llm.RateLimit{PerSecond: c.RatePerSecond, PerMinute: c.RatePerMinute}
 	}
-	return llm.NewProvider(lc)
+	provider, err := llm.NewProvider(lc)
+	if err == nil && chatGPT {
+		return chatGPTProvider{provider}, nil
+	}
+	return provider, err
 }
 
 // IsQuotaExhaustedMessage deliberately recognizes only explicit balance,
